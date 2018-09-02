@@ -1,0 +1,6 @@
+https://en.wikipedia.org/wiki/Vertex_buffer_object
+
+vertexArray까지 예제 만들고
+shader 함수 만드는 중이엇음
+
+여러 자료형을 동적으로 연속된 공간에 저장할 방법을 생각해야함
