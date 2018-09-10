@@ -5,7 +5,7 @@ ML::Window::Window() : m_Width(1024), m_Height(768), m_Title("Title")
 {
 }
 
-bool ML::Window::Init(int width, int height, const std::string& title)
+bool ML::Window::Init(unsigned int width, unsigned int height, const std::string& title)
 {
 	m_Width = width;
 	m_Height = height;
@@ -28,7 +28,7 @@ bool ML::Window::Init(int width, int height, const std::string& title)
 	}
 	//키입력 감지
 	glfwSetInputMode(m_Window, GLFW_STICKY_KEYS, GL_TRUE);
-
+	return true;
 }
 
 bool ML::Window::WindowShouldClose()

@@ -1,7 +1,6 @@
 
 #include <GL/glew.h>	//opengl의 추가적 기능
 #include <GLFW/glfw3.h>	//윈도우 생성을 위함
-#include <stdio.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -11,6 +10,8 @@
 
 using namespace ML;
 
+
+
 GLuint LoadShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
 std::string ParseShader(const std::string& filePath);
 int main()
@@ -19,7 +20,7 @@ int main()
 		return -1;
 
 	Window window;
-	window.Init(1024,768,"MyLittleEngine");
+	window.Init(640,480,"MyLittleEngine");
 	typedef struct _vertex {
 		float x, y, z;
 	}Vertex;
@@ -34,9 +35,14 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
+	GLuint programID = LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
+	glUseProgram(programID);
 	while (!window.WindowShouldClose())
 	{
 		//그리는 부분
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 		glVertexAttribPointer(
@@ -60,10 +66,79 @@ int main()
 std::string ParseShader(const std::string& filePath)
 {
 	std::ifstream stream(filePath);
-	std::string line;
+	std::string code;
+	if (stream.is_open())
+	{
+		std::stringstream sstr;
+		sstr << stream.rdbuf();
+		code = sstr.str();
+		stream.close();
+	}
+	else
+	{
+		printf("파일 %s를 읽을 수 없음", filePath);
+		return 0;
+	}
+	return code;
 }
+void CompileShader(GLuint shaderID, const std::string& shaderCode)
+{
+	GLint result = GL_FALSE;
+	const char* src = shaderCode.c_str();
 
+	glShaderSource(shaderID, 1, &src, NULL);
+	glCompileShader(shaderID);
+
+	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int infoLogLength;
+		char *msg;
+		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
+		msg = new char[infoLogLength+1];
+		glGetShaderInfoLog(shaderID, infoLogLength, NULL, msg);
+		printf("%s\n",msg);
+	}
+
+}
+GLuint LinkShaders(GLuint vertexShaderID, GLuint fragmentShaderID)
+{
+	GLint result = GL_FALSE;
+	GLuint programID = glCreateProgram();
+	glAttachShader(programID, vertexShaderID);
+	glAttachShader(programID, fragmentShaderID);
+	glLinkProgram(programID);
+
+	glGetProgramiv(programID, GL_LINK_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int infoLogLength;
+		char *msg;
+		glGetShaderiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
+		msg = new char[infoLogLength + 1];
+		glGetShaderInfoLog(programID, infoLogLength, NULL, msg);
+		printf("%s\n", msg);
+	}
+	return programID;
+}
 GLuint LoadShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
 {
+	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
+	std::string vertexShaderCode = ParseShader(vertexShaderPath);
+	std::string fragmentShaderCode = ParseShader(fragmentShaderPath);
+
+	CompileShader(vertexShaderID, vertexShaderCode);
+	CompileShader(fragmentShaderID, fragmentShaderCode);
+
+	GLuint programID = LinkShaders(vertexShaderID, fragmentShaderID);
+
+	glDetachShader(programID, vertexShaderID);
+	glDetachShader(programID, fragmentShaderID);
+
+	glDeleteShader(vertexShaderID);
+	glDeleteShader(fragmentShaderID);
+
+	return programID;
 }

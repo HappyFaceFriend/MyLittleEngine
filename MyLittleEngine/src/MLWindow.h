@@ -6,13 +6,13 @@ namespace ML {
 	class Window
 	{
 	private:
-		int m_Height;
-		int m_Width;
+		unsigned int m_Height;
+		unsigned int m_Width;
 		std::string m_Title;
 		GLFWwindow *m_Window;
 	public:
 		Window();
-		bool Init(int width, int height, const std::string& title);
+		bool Init(unsigned int width, unsigned int height, const std::string& title);
 		bool WindowShouldClose();
 		void SwapBuffers();
 		~Window();

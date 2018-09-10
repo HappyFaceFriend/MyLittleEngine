@@ -7,7 +7,7 @@ namespace ML {
 	{
 		if (!glfwInit())
 		{
-			fprintf(stderr, "GLFW 초기화 실패\n");
+			std::cout << "GLFW 초기화 실패\n" << std::endl;
 			return false;
 		}
 		glfwWindowHint(GLFW_SAMPLES, 4); // 4x 안티에일리어싱
