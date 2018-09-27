@@ -5,46 +5,70 @@
 #include <fstream>
 #include <sstream>
 
-#include "MLGLFW.h"
-#include "MLWindow.h"
-
-using namespace ML;
-
+#include "GLDebug.h"
+#include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 
 
 GLuint LoadShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
 std::string ParseShader(const std::string& filePath);
+
 int main()
 {
-	if (!InitGLFW())
+	if (!glfwInit())
+	{
+		std::cout << "GLFW 초기화 실패\n" << std::endl;
 		return -1;
+	}
+	glfwWindowHint(GLFW_SAMPLES, 4); // 4x 안티에일리어싱
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // ver 3.3
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // for mac
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //최신버전
+	glewExperimental = true; //최신버전 받기위함
 
-	Window window;
-	window.Init(640,480,"MyLittleEngine");
+	GLFWwindow *window = glfwCreateWindow(800, 600, "MyLittleEngine", NULL, NULL);//새 창 열고 컨텍스트 생성
+	if (window == NULL)
+	{
+		std::cout << "GLFW윈도우 실패" << std::endl;
+		glfwTerminate();
+	}
+
+	glfwMakeContextCurrent(window); //GLEW 초기화
+
+	if (glewInit() != GLEW_OK)
+	{
+		std::cout << "Failed to initialize GLEW" << std::endl;
+		glfwTerminate();
+		return false;
+	}
+	//키입력 감지
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+
 	typedef struct _vertex {
 		float x, y, z;
 	}Vertex;
-	static const Vertex g_vertex_buffer_data[] = {
+	static const Vertex vertexDatas[] = {
 		{-1.0f, -1.0f, 0.0f},
 		{1.0f, -1.0f, 0.0f},
 		{0.0f,  1.0f, 0.0f },
 	};
+	VertexBuffer vb(sizeof(float) * 3, vertexDatas);
+	//vb.Bind();
 
-	GLuint vertexBuffer;
-	glGenBuffers(1, &vertexBuffer); //vb한개 생성
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	GLuint VertexArrayID;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
 
-	GLuint programID = LoadShaders("SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader");
-	glUseProgram(programID);
-	while (!window.WindowShouldClose())
+	GLuint programID = LoadShaders("res/SimpleVertexShader.vertexshader", "res/SimpleFragmentShader.fragmentshader");
+
+	while (!glfwWindowShouldClose(window))
 	{
 		//그리는 부분
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		glUseProgram(programID);
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 		glVertexAttribPointer(
 			0,			//0번째속성 (shader의 layout과 매칭돼야함)
 			3,			//count
@@ -55,10 +79,12 @@ int main()
 		);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDisableVertexAttribArray(0);
-
-		window.SwapBuffers();
-		PollEvents();
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
+	glfwTerminate();
+	glDeleteProgram(programID);
+	glDeleteVertexArrays(1, &VertexArrayID);
 
 	return 0;
 }
@@ -76,7 +102,7 @@ std::string ParseShader(const std::string& filePath)
 	}
 	else
 	{
-		printf("파일 %s를 읽을 수 없음", filePath);
+		std::cout << "파일을 읽을 수 없음:" << filePath << std::endl;
 		return 0;
 	}
 	return code;
@@ -116,7 +142,7 @@ GLuint LinkShaders(GLuint vertexShaderID, GLuint fragmentShaderID)
 		char *msg;
 		glGetShaderiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
 		msg = new char[infoLogLength + 1];
-		glGetShaderInfoLog(programID, infoLogLength, NULL, msg);
+		glGetProgramInfoLog(programID, infoLogLength, NULL, msg);
 		printf("%s\n", msg);
 	}
 	return programID;

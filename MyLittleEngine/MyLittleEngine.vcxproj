@@ -130,14 +130,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\GLDebug.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\MLWindow.cpp" />
+    <ClCompile Include="src\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GLDebug.h" />
-    <ClInclude Include="src\MLGLFW.h" />
-    <ClInclude Include="src\MLWindow.h" />
+    <ClInclude Include="src\VertexBuffer.h" />
+    <ClInclude Include="src\VertexBufferLayout.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
