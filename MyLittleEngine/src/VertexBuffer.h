@@ -1,5 +1,4 @@
 #pragma once
-
 class VertexBuffer
 {
 private:
@@ -8,6 +7,6 @@ public:
 	VertexBuffer(unsigned int size, const void* data);
 	~VertexBuffer();
 	void Bind() const;
-	void UnBind() const;
+	void Unbind() const;
 
 };
