@@ -130,20 +130,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\GLDebug.cpp" />
+    <ClCompile Include="src\Maths\Matrix4.cpp" />
+    <ClCompile Include="src\GLContents\IndexBuffer.cpp" />
+    <ClCompile Include="src\GLContents\Renderer.cpp" />
+    <ClCompile Include="src\GLContents\Shader.cpp" />
+    <ClCompile Include="src\GLContents\GLDebug.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\VertexBuffer.cpp" />
-    <ClCompile Include="src\VertexBufferLayout.cpp" />
-    <ClCompile Include="src\VertexArray.cpp" />
+    <ClCompile Include="src\GLContents\VertexBuffer.cpp" />
+    <ClCompile Include="src\GLContents\VertexBufferLayout.cpp" />
+    <ClCompile Include="src\GLContents\VertexArray.cpp" />
+    <ClCompile Include="src\Maths\Vector4.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Shader.h" />
-    <ClInclude Include="src\GLDebug.h" />
-    <ClInclude Include="src\VertexBuffer.h" />
-    <ClInclude Include="src\VertexBufferElement.h" />
-    <ClInclude Include="src\VertexBufferLayout.h" />
-    <ClInclude Include="src\VertexArray.h" />
+    <ClInclude Include="src\Maths\Matrix4.h" />
+    <ClInclude Include="src\GLContents\IndexBuffer.h" />
+    <ClInclude Include="src\MyLittleGLContents.h" />
+    <ClInclude Include="src\GLContents\Renderer.h" />
+    <ClInclude Include="src\GLContents\Shader.h" />
+    <ClInclude Include="src\GLContents\GLDebug.h" />
+    <ClInclude Include="src\GLContents\VertexBuffer.h" />
+    <ClInclude Include="src\GLContents\VertexBufferElement.h" />
+    <ClInclude Include="src\GLContents\VertexBufferLayout.h" />
+    <ClInclude Include="src\GLContents\VertexArray.h" />
+    <ClInclude Include="src\Maths\Vector4.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

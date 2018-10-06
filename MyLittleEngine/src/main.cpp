@@ -6,13 +6,8 @@
 #include <sstream>
 #include <iostream>
 
-#include "VertexBuffer.h"
-#include "GLDebug.h"
-#include "VertexArray.h"
-#include "Shader.h"
-
-GLuint LoadShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
-std::string ParseShader(const std::string& filePath);
+#include "MyLittleGLContents.h"
+#include "Maths/Vector4.h"
 
 int main()
 {
@@ -46,6 +41,11 @@ int main()
 	//키입력 감지
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
+	Vector4 vec1(1, 1, 1, 1);
+	Vector4 vec2(2, 3, 4, 1);
+	vec1 = vec1 + vec2;
+	std::cout << vec1 << std::endl;
+
 	typedef struct _vertex {
 		float x, y, z;
 	}Vertex;
@@ -54,22 +54,32 @@ int main()
 		{1.0f, -1.0f, 0.0f},
 		{0.0f,  1.0f, 0.0f },
 	};
+	static const unsigned int indicies[] = {
+		0,1,2
+	};
 	VertexBuffer vb(sizeof(float) * 3 * 3 , vertexDatas);
 	vb.Bind();
+
 	VertexBufferLayout layout;
 	layout.Push(GL_FLOAT, 3);
 	VertexArray va;
 	va.AddBuffer(vb, layout);
 	va.Bind();
+
+	IndexBuffer ib(indicies, 3);
+	ib.Bind();
+
 	Shader shader = Shader("res/SimpleVertexShader.vertexshader", "res/SimpleFragmentShader.fragmentshader");
 	shader.Bind();
+
+	Renderer renderer;
+	renderer.BindObjects(va, ib, shader);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		//그리는 부분
-
-		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-		
-		GLCall(glDrawArrays(GL_TRIANGLES, 0, 3));
+		renderer.Clear();
+		renderer.Render();
 		//GLCall(glDisableVertexAttribArray(0));
 		glfwSwapBuffers(window);
 		glfwPollEvents();
