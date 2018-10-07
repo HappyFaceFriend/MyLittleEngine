@@ -5,6 +5,7 @@ class VertexArray
 {
 private:
 	unsigned int m_Id;
+	unsigned int m_IndexCount;
 public:
 	VertexArray();
 	~VertexArray();

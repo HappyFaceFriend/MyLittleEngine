@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include "GLDebug.h"
+#include <glm/gtc/type_ptr.hpp>
 
 Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
 {
@@ -14,6 +15,33 @@ Shader::~Shader()
 {
 	glDeleteProgram(m_Id);
 }
+void Shader::SetUniformMat4(const std::string& name, const glm::mat4 mat)
+{
+	Bind();
+	glUniformMatrix4fv(GetLocation(name), 1, GL_FALSE, glm::value_ptr(mat));
+}
+void Shader::SetUniform4f(const std::string& name, float v1, float v2, float v3, float v4)
+{
+	Bind();
+	glUniform4f(GetLocation(name), v1, v2, v3, v4);
+}
+void Shader::SetUniform1i(const std::string& name, int v)
+{
+	Bind();
+	glUniform1i(GetLocation(name), v);
+}
+
+
+int Shader::GetLocation(const std::string& name)
+{
+	if (m_LocationCache.find(name) != m_LocationCache.end())
+		return m_LocationCache[name];
+	int id = glGetUniformLocation(m_Id, name.c_str());
+	if(id==-1)
+		std::cout<<"Can't find uniform """<<name<<""""<<std::endl;
+	return id;
+}
+
 
 void Shader::Bind() const
 {

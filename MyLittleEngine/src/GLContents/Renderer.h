@@ -8,8 +8,8 @@ class Renderer
 public:
 	Renderer();
 	~Renderer();
-	void Render() const;
-	void BindObjects(const VertexArray& va, const IndexBuffer& ib, const Shader& shader);
+	void Render(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+	void Render(const VertexArray& va, const Shader& shader, unsigned int count) const;
 	void Clear() const;
 };
 
