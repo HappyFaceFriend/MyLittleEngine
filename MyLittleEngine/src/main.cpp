@@ -13,15 +13,7 @@
 #include "MyLittleGLContents.h"
 #include "stb_image\stb_image.h"
 #include "MyCamera.h"
-GLFWwindow *window;
-glm::mat4 Projection, View, Model;
 
-glm::vec3 position = glm::vec3(-3, 3, 7);
-float horizontalAngle = 3.14f;
-float verticalAngle = 0.f;
-float initialFoV = 45.f; //field of view
-float speed = 3.f;
-float mouseSpeed = 0.05f;
 float deltaTime = 0.016;
 double currentTime;
 double lastTime = glfwGetTime();
@@ -76,48 +68,6 @@ GLuint loadBMP_custom(const char * imagePath)
 	return textureID;
 }
 
-
-void computeMatricesFromInputs()
-{
-	//TODO:총체적난국
-
-	double dx, dy;
-	glfwGetCursorPos(window, &dx, &dy);
-	glfwSetCursorPos(window, 800 / 2, 600 / 2);
-	horizontalAngle += mouseSpeed*deltaTime*float(800 / 2 - dx);
-	verticalAngle += mouseSpeed*deltaTime*float(600 / 2 - dy);
-	// Direction : Spherical coordinates to Cartesian coordinates conversion
-	glm::vec3 front(
-		cos(verticalAngle) * sin(horizontalAngle),
-		sin(verticalAngle),
-		cos(verticalAngle) * cos(horizontalAngle)
-	);
-	glm::vec3 right = glm::vec3(
-		sin(horizontalAngle - 3.141592f / 2.f),
-		0,
-		cos(verticalAngle - 3.141592f / 2.f)
-	);
-	glm::vec3 up = glm::cross(right, front);
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		position += front*deltaTime*speed;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		position -= front*deltaTime*speed;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		position -= right*deltaTime*speed;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		position += right*deltaTime*speed;
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		initialFoV -= 45 * deltaTime;
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		initialFoV += 45 * deltaTime;
-	Projection = glm::perspective(glm::radians(initialFoV), 4 / 3.f, 0.1f, 100.f);
-	View = glm::lookAt(
-		position,
-		position + front,
-		up
-	);
-}
 int main()
 {
 	if (!glfwInit())
@@ -132,7 +82,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //최신버전
 	glewExperimental = true; //최신버전 받기위함
 
-	window = glfwCreateWindow(800, 600, "MyLittleEngine", NULL, NULL);//새 창 열고 컨텍스트 생성
+	GLFWwindow *window = glfwCreateWindow(800, 600, "MyLittleEngine", NULL, NULL);//새 창 열고 컨텍스트 생성
 	if (window == NULL)
 	{
 		std::cout << "GLFW윈도우 실패" << std::endl;
@@ -327,15 +277,15 @@ int main()
 
 	shader.SetUniform1i("myTextureSampler", 0);
 
-	MyCamera camera(window);
+	MyCamera camera(window,3.0f,0.5);
 
+	glm::mat4 Projection, View, Model;
 	Model = glm::mat4(1.f);
 	/*glm::mat4 View = glm::lookAt(
 		glm::vec3(4, 3, 3), // 카메라는 (4,3,3) 에 있다. 월드 좌표에서
 		glm::vec3(0, 0, 0), // 그리고 카메라가 원점을 본다
 		glm::vec3(0, 1, 0)  // 머리가 위쪽이다 (0,-1,0 으로 해보면, 뒤집어 볼것이다)
 	);*/
-	View = camera.GetViewMatrix();
 	// 프로젝션 매트릭스 : 45도 시야각, 4:3 비율, 시야 범위 : 0.1 유닛 <--> 100 유닛
 	Projection = glm::perspective(glm::radians(45.0f), (float)4 / (float)3, 0.1f, 100.0f);
 	//glm::mat4 Projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.0f, 100.0f);
@@ -363,6 +313,7 @@ int main()
 		//computeMatricesFromInputs();
 		//Projection = getProjectionMatrix();
 		//View = getViewMatrix();
+		View = camera.GetViewMatrix();
 		glm::mat4 mvp = Projection * View * Model;
 		shader.SetUniformMat4("mvp", mvp);
 
