@@ -12,8 +12,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "MyLittleGLContents.h"
 #include "stb_image\stb_image.h"
-#include "GLContents\Controls.h"
-
+#include "MyCamera.h"
 GLFWwindow *window;
 glm::mat4 Projection, View, Model;
 
@@ -24,8 +23,8 @@ float initialFoV = 45.f; //field of view
 float speed = 3.f;
 float mouseSpeed = 0.05f;
 float deltaTime = 0.016;
-double currentTime = glfwGetTime();
-double lastTime;
+double currentTime;
+double lastTime = glfwGetTime();
 
 GLuint loadBMP_custom(const char * imagePath)
 {
@@ -81,9 +80,6 @@ GLuint loadBMP_custom(const char * imagePath)
 void computeMatricesFromInputs()
 {
 	//TODO:총체적난국
-	lastTime = currentTime;
-	currentTime = glfwGetTime();
-	deltaTime = float(currentTime - lastTime);
 
 	double dx, dy;
 	glfwGetCursorPos(window, &dx, &dy);
@@ -331,17 +327,15 @@ int main()
 
 	shader.SetUniform1i("myTextureSampler", 0);
 
+	MyCamera camera(window);
+
 	Model = glm::mat4(1.f);
 	/*glm::mat4 View = glm::lookAt(
 		glm::vec3(4, 3, 3), // 카메라는 (4,3,3) 에 있다. 월드 좌표에서
 		glm::vec3(0, 0, 0), // 그리고 카메라가 원점을 본다
 		glm::vec3(0, 1, 0)  // 머리가 위쪽이다 (0,-1,0 으로 해보면, 뒤집어 볼것이다)
 	);*/
-	View = glm::lookAt(
-		glm::vec3(-3, 3, 7), 
-		glm::vec3(0, 0, 0), 
-		glm::vec3(0, 1, 0)  
-	);
+	View = camera.GetViewMatrix();
 	// 프로젝션 매트릭스 : 45도 시야각, 4:3 비율, 시야 범위 : 0.1 유닛 <--> 100 유닛
 	Projection = glm::perspective(glm::radians(45.0f), (float)4 / (float)3, 0.1f, 100.0f);
 	//glm::mat4 Projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.0f, 100.0f);
@@ -356,11 +350,17 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 
+		currentTime = glfwGetTime();
+		deltaTime = float(currentTime - lastTime);
+		lastTime = currentTime;
+
+		camera.Move();
+		camera.Update();
 		//그리는 부분
 		renderer.Clear();
 
 	
-		computeMatricesFromInputs();
+		//computeMatricesFromInputs();
 		//Projection = getProjectionMatrix();
 		//View = getViewMatrix();
 		glm::mat4 mvp = Projection * View * Model;
