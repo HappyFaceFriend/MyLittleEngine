@@ -277,7 +277,7 @@ int main()
 
 	shader.SetUniform1i("myTextureSampler", 0);
 
-	MyCamera camera(window,3.0f,0.5);
+	MyCamera camera(window,3.0f,0.05);
 
 	glm::mat4 Projection, View, Model;
 	Model = glm::mat4(1.f);
@@ -287,16 +287,28 @@ int main()
 		glm::vec3(0, 1, 0)  // 머리가 위쪽이다 (0,-1,0 으로 해보면, 뒤집어 볼것이다)
 	);*/
 	// 프로젝션 매트릭스 : 45도 시야각, 4:3 비율, 시야 범위 : 0.1 유닛 <--> 100 유닛
-	Projection = glm::perspective(glm::radians(45.0f), (float)4 / (float)3, 0.1f, 100.0f);
 	//glm::mat4 Projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.0f, 100.0f);
 	glm::mat4 mvp = Projection * View * Model;
 
+	glm::vec3 translationArr[] = {
+		{ 0, 0, 0 },
+		{ 2, 0, 0 },
+		{ 0, 2, 0 },
+		{ -2, 0, 0 },
+		{ 0, -2, 0 },
+		{ 2, 2, 0 },
+		{ -2, 2, 0 },
+		{ 2, -2, 0 },
+		{ -2, -2, 0 }
+
+	};
 
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
 	while (!glfwWindowShouldClose(window))
 	{
 
@@ -313,11 +325,16 @@ int main()
 		//computeMatricesFromInputs();
 		//Projection = getProjectionMatrix();
 		//View = getViewMatrix();
-		View = camera.GetViewMatrix();
-		glm::mat4 mvp = Projection * View * Model;
-		shader.SetUniformMat4("mvp", mvp);
+		for(int i=0; i<9; i++)
+		{
+			Model = glm::translate(glm::mat4(1.f), translationArr[i]);
+			View = camera.GetViewMatrix();
+			Projection = camera.GetProjectionMatrix();
+			glm::mat4 mvp = Projection * View * Model;
+			shader.SetUniformMat4("mvp", mvp);
+			renderer.Render(va, shader, 12 * 3);
+		}
 
-		renderer.Render(va, shader, 12 * 3);
 		//GLCall(glDisableVertexAttribArray(0));
 		glfwSwapBuffers(window);
 		glfwPollEvents();

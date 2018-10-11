@@ -1,2 +1,6 @@
 ﻿  MyCamera.cpp
-  MyLittleEngine.vcxproj -> C:\gittemp\Debug\MyLittleEngine.exe
+d:\myfolder\gitprojects\mylittleengine\mylittleengine\src\mycamera.cpp(30): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+d:\myfolder\gitprojects\mylittleengine\mylittleengine\src\mycamera.cpp(32): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+d:\myfolder\gitprojects\mylittleengine\mylittleengine\src\mycamera.cpp(35): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+d:\myfolder\gitprojects\mylittleengine\mylittleengine\src\mycamera.cpp(37): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+  MyLittleEngine.vcxproj -> D:\MyFolder\GitProjects\MyLittleEngine\Debug\MyLittleEngine.exe
