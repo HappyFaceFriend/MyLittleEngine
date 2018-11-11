@@ -4,10 +4,11 @@ in vec2 fragmentUV;
 
 uniform sampler2D myTextureSampler;
 
-out vec3 color;
+out vec4 color;
 
 
 void main()
 {
-	color = texture(myTextureSampler, fragmentUV).rgb;
+	vec4 texColor = texture(myTextureSampler, fragmentUV);
+	color = texColor;
 }
